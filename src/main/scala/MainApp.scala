@@ -34,7 +34,7 @@ object MainApp extends Basic {
     val doubleCols = Array("Total_Stops", "Journey_Day", "Journey_Month", "Departure_Hour", 
       "Departure_Minute", "Arrival_Hour", "Arrival_Minute", "Duration_hours", "Duration_minutes")
 
-    val exercise: Seq[RegressionExercise] = Seq(LinearRegressionExercise, RandomForestTreesExercise)
+    val exercise: Seq[RegressionExercise] = Seq(LinearRegressionExercise, RandomForestTreesExercise, GradientBoostedTreesExercise)
     exercise.foreach(e => {
       e.trainModel(train, cateCols, doubleCols)
       e.metrics(test)
@@ -50,14 +50,14 @@ object MainApp extends Basic {
       withColumn("label", col("price").cast("double")).drop("Price")
     featrueDF.cache()
 
-    val Array(train, test) = featrueDF.randomSplit(Array(0.70, 0.30), 42)
+    val Array(train, test) = featrueDF.randomSplit(Array(0.80, 0.20), 42)
     train.sample(0.01).show(2)
     test.sample(0.1).show(2)
 
     val cateCols = Array("airline", "flight", "source_city", "departure_time", "stops", "arrival_time", "destination_city", "class")
     val doubleCols = Array("duration", "days_left")
 
-    val exercise: Seq[RegressionExercise] = Seq(GradientBoostedTreesExercise)
+    val exercise: Seq[RegressionExercise] = Seq(GradientBoostedTreesExercise, LinearRegressionExercise, RandomForestTreesExercise)
     exercise.foreach(e => {
       e.trainModel(train, cateCols, doubleCols)
       e.metrics(test, "/tmp/ml/easemytrip/gradient-boosted-trees-txercise-prediction")
