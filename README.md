@@ -58,3 +58,41 @@ Explained variance = 4.9095901242378914E8
 -----------------------------------------------
 
 ```
+
+## ease tripe
+```
+-----------------------------------------------
+GradientBoostedTrees:
+MSE = 2.217834088577796E7
+RMSE = 4709.388589379513
+R-squared = 0.957221585978728
+MAE = 2813.8764660294496
+Explained variance = 4.897021489636351E8
+-----------------------------------------------
+22/06/19 20:29:42 WARN InstanceBuilder$NativeBLAS: Failed to load implementation from:dev.ludovic.netlib.blas.JNIBLAS
+22/06/19 20:29:42 WARN InstanceBuilder$NativeBLAS: Failed to load implementation from:dev.ludovic.netlib.blas.ForeignLinkerBLAS
+22/06/19 20:29:43 WARN InstanceBuilder$NativeLAPACK: Failed to load implementation from:dev.ludovic.netlib.lapack.JNILAPACK
+22/06/19 20:30:16 WARN BLAS: Failed to load implementation from: com.github.fommil.netlib.NativeSystemBLAS
+22/06/19 20:30:16 WARN BLAS: Failed to load implementation from: com.github.fommil.netlib.NativeRefBLAS
+-----------------------------------------------
+LinearRegression:
+MSE = 3.836675511264046E7
+RMSE = 6194.090337784916
+R-squared = 0.9259967666962065
+MAE = 4277.772269744498
+Explained variance = 4.78840610974997E8
+-----------------------------------------------
+
+-----------------------------------------------
+RandomForestRegressor:
+MSE = 1.2166650487375194E7
+RMSE = 3488.072603512604
+R-squared = 0.9765325091501861
+MAE = 1925.5305063516325
+Explained variance = 4.9820222641830015E8
+-----------------------------------------------
+
+
+Application ID	Name	Cores	Memory per Executor	Resources Per Executor	Submitted Time	User	State	Duration
+app-20220619223521-0003	Extract Featrue mh data set	8	5.0 GiB		2022/06/19 22:35:21	changzhi	FINISHED	23 min
+```

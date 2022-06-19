@@ -6,7 +6,7 @@ trait Basic {
   def getSession(appName: String): SparkSession = {
     SparkSession.builder().
       appName(appName).
-      config("spark.executor.memory", "8g").
+      config("spark.executor.memory", "5g").
       getOrCreate()
   }
 }

@@ -36,8 +36,7 @@ object MainApp extends Basic {
 
     val exercise: Seq[RegressionExercise] = Seq(LinearRegressionExercise, RandomForestTreesExercise, GradientBoostedTreesExercise)
     exercise.foreach(e => {
-      e.trainModel(train, cateCols, doubleCols)
-      e.metrics(test)
+      e.trainModel(train, cateCols, doubleCols, test)
     })
   }
 
@@ -59,8 +58,7 @@ object MainApp extends Basic {
 
     val exercise: Seq[RegressionExercise] = Seq(GradientBoostedTreesExercise, LinearRegressionExercise, RandomForestTreesExercise)
     exercise.foreach(e => {
-      e.trainModel(train, cateCols, doubleCols)
-      e.metrics(test, "/tmp/ml/easemytrip/gradient-boosted-trees-txercise-prediction")
+      e.trainModel(train, cateCols, doubleCols, test)
     })
   }
 }

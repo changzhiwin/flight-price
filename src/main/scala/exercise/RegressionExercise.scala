@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
 
 trait RegressionExercise {
 
-  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String]): Unit
+  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String], testDF: DataFrame): Unit
 
   def metrics(df: DataFrame, predictFile: String = ""): Unit
 
@@ -17,7 +17,7 @@ trait RegressionExercise {
 
     val stages = new ArrayBuffer[PipelineStage]()
 
-    val cates = cateCols //Array("Airline", "Source", "Destination", "Additional_Info")
+    val cates = cateCols
 
     val sis = cates.map(c => new StringIndexer().setInputCol(c).setOutputCol(s"${c}Ind").setHandleInvalid("skip"))
     stages ++= sis
@@ -28,12 +28,6 @@ trait RegressionExercise {
     val featrueCols = doubleCols ++ cateCols.map(c => s"${c}Vec")
     val assembler = new VectorAssembler().
       setInputCols(featrueCols).
-      /*
-      // "Journey_WeekDay",
-      setInputCols(Array("Total_Stops", "Journey_Day", "Journey_Month", "Departure_Hour", 
-        "Departure_Minute", "Arrival_Hour", "Arrival_Minute", "Duration_hours", "Duration_minutes",
-        "AirlineVec", "SourceVec", "DestinationVec", "Additional_InfoVec")).
-      */
       setOutputCol("features").
       setHandleInvalid("skip")
     stages += assembler

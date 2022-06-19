@@ -6,10 +6,11 @@ import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.tuning.{ TrainValidationSplit, ParamGridBuilder }
 import org.apache.spark.ml.regression.GBTRegressor
 import org.apache.spark.mllib.evaluation.RegressionMetrics
+import org.apache.spark.ml.tuning.TrainValidationSplitModel
 
 object GradientBoostedTreesExercise extends RegressionExercise {
 
-  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String]): Unit = {
+  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String], testDF: DataFrame): Unit = {
 
     val stages = earlyEncodeStates(cateCols, doubleCols)
     val gbt = new GBTRegressor()
@@ -33,12 +34,25 @@ object GradientBoostedTreesExercise extends RegressionExercise {
 
     val model = tvs.fit(df)
 
-    model.write.overwrite().save("/tmp/modelLocationGradientBoostedTrees")
+    val outDF = model.transform(testDF).
+      select("prediction", "label")
+
+    val out = outDF.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double]))
+  
+    val rm = new RegressionMetrics(out)
+    println("-----------------------------------------------")
+    println("GradientBoostedTrees:")
+    println(s"MSE = ${rm.meanSquaredError}")
+    println(s"RMSE = ${rm.rootMeanSquaredError}")
+    println(s"R-squared = ${rm.r2}")
+    println(s"MAE = ${rm.meanAbsoluteError}")
+    println(s"Explained variance = ${rm.explainedVariance}")
+    println("-----------------------------------------------")
+
+    // model.write.overwrite().save("/tmp/modelLocationGradientBoostedTrees")
   }
 
   def metrics(df: DataFrame, predictFile: String = ""): Unit = {
-
-    import org.apache.spark.ml.tuning.TrainValidationSplitModel
 
     val model = TrainValidationSplitModel.load("/tmp/modelLocationGradientBoostedTrees")
 

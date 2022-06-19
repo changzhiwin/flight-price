@@ -9,7 +9,7 @@ import org.apache.spark.mllib.evaluation.RegressionMetrics
 
 object RandomForestTreesExercise extends RegressionExercise {
 
-  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String]): Unit = {
+  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String], testDF: DataFrame): Unit = {
 
     val stages = earlyEncodeStates(cateCols, doubleCols)
     val rf = new RandomForestRegressor()
@@ -34,7 +34,21 @@ object RandomForestTreesExercise extends RegressionExercise {
 
     val model = tvs.fit(df)
 
-    model.write.overwrite().save("/tmp/modelLocationRandomForestRegressor")
+    val outDF = model.transform(testDF).
+      select("prediction", "label")
+
+    val out = outDF.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double]))  
+
+    val rm = new RegressionMetrics(out)
+    println("-----------------------------------------------")
+    println("RandomForestRegressor:")
+    println(s"MSE = ${rm.meanSquaredError}")
+    println(s"RMSE = ${rm.rootMeanSquaredError}")
+    println(s"R-squared = ${rm.r2}")
+    println(s"MAE = ${rm.meanAbsoluteError}")
+    println(s"Explained variance = ${rm.explainedVariance}")
+    println("-----------------------------------------------")
+    //model.write.overwrite().save("/tmp/modelLocationRandomForestRegressor")
   }
 
   def metrics(df: DataFrame, predictFile: String = ""): Unit = {
