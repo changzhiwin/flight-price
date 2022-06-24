@@ -9,9 +9,9 @@ import zhiwin.spark.practice.ml.exercise.{ RegressionExercise, LinearRegressionE
 
 object MainApp extends Basic {
   def main(args: Array[String]) = {
-    val spark = getSession("Extract Featrue mh data set")
 
     val lib = args(0)
+    val spark = getSession(s"Flight Price Model - ${lib}")
 
     lib match {
       case "EASE"   => doEaseMyTripLib(spark)
@@ -26,7 +26,7 @@ object MainApp extends Basic {
     val featrueDF =  ExtractFeatureMH.getFeatures(spark, "data/mh/DataSet.csv")
     featrueDF.cache()
 
-    val Array(train, test) = featrueDF.randomSplit(Array(0.70, 0.30), 42)
+    val Array(train, test) = featrueDF.randomSplit(Array(0.90, 0.10), 42)
     train.sample(0.01).show(2)
     test.sample(0.1).show(2)
 
@@ -56,9 +56,9 @@ object MainApp extends Basic {
     val cateCols = Array("airline", "flight", "source_city", "departure_time", "stops", "arrival_time", "destination_city", "class")
     val doubleCols = Array("duration", "days_left")
 
-    val exercise: Seq[RegressionExercise] = Seq(GradientBoostedTreesExercise, LinearRegressionExercise, RandomForestTreesExercise)
+    val exercise: Seq[RegressionExercise] = Seq(/*GradientBoostedTreesExercise, LinearRegressionExercise, */RandomForestTreesExercise)
     exercise.foreach(e => {
-      e.trainModel(train, cateCols, doubleCols, test)
+      e.trainModel(train, cateCols, doubleCols, test, "/tmp/flight-price")
     })
   }
 }

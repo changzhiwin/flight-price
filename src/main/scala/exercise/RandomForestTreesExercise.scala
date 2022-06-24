@@ -9,7 +9,9 @@ import org.apache.spark.mllib.evaluation.RegressionMetrics
 
 object RandomForestTreesExercise extends RegressionExercise {
 
-  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String], testDF: DataFrame): Unit = {
+  val name = "random-forest-trees"
+
+  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String], testDF: DataFrame, outDir: String = ""): Unit = {
 
     val stages = earlyEncodeStates(cateCols, doubleCols)
     val rf = new RandomForestRegressor()
@@ -33,37 +35,15 @@ object RandomForestTreesExercise extends RegressionExercise {
       .setTrainRatio(0.8)
 
     val model = tvs.fit(df)
+    //model.write.overwrite().save("/tmp/modelLocationRandomForestRegressor")
 
     val outDF = model.transform(testDF).
       select("prediction", "label")
 
-    val out = outDF.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double]))  
-
-    val rm = new RegressionMetrics(out)
-    println("-----------------------------------------------")
-    println("RandomForestRegressor:")
-    println(s"MSE = ${rm.meanSquaredError}")
-    println(s"RMSE = ${rm.rootMeanSquaredError}")
-    println(s"R-squared = ${rm.r2}")
-    println(s"MAE = ${rm.meanAbsoluteError}")
-    println(s"Explained variance = ${rm.explainedVariance}")
-    println("-----------------------------------------------")
-    //model.write.overwrite().save("/tmp/modelLocationRandomForestRegressor")
-  }
-
-  def metrics(df: DataFrame, predictFile: String = ""): Unit = {
-
-    import org.apache.spark.ml.tuning.TrainValidationSplitModel
-
-    val model = TrainValidationSplitModel.load("/tmp/modelLocationRandomForestRegressor")
-
-    val outDF = model.transform(df).
-      select("prediction", "label")
-
-    if (predictFile.length > 5){
+    if (outDir.length > 5){
       outDF.write.format("csv").
         option("header", true).
-        save(predictFile)
+        save(s"${outDir}/${name}")
     }
 
     val out = outDF.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double]))  
@@ -76,6 +56,6 @@ object RandomForestTreesExercise extends RegressionExercise {
     println(s"R-squared = ${rm.r2}")
     println(s"MAE = ${rm.meanAbsoluteError}")
     println(s"Explained variance = ${rm.explainedVariance}")
-    println("-----------------------------------------------")
+    
   }
 }

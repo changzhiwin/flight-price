@@ -10,7 +10,9 @@ import org.apache.spark.ml.tuning.TrainValidationSplitModel
 
 object GradientBoostedTreesExercise extends RegressionExercise {
 
-  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String], testDF: DataFrame): Unit = {
+  val name = "gradient-boosted-trees"
+
+  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String], testDF: DataFrame, outDir: String = ""): Unit = {
 
     val stages = earlyEncodeStates(cateCols, doubleCols)
     val gbt = new GBTRegressor()
@@ -33,36 +35,15 @@ object GradientBoostedTreesExercise extends RegressionExercise {
       .setTrainRatio(0.7)
 
     val model = tvs.fit(df)
+    //model.write.overwrite().save("/tmp/modelLocationGradientBoostedTrees")
 
     val outDF = model.transform(testDF).
       select("prediction", "label")
 
-    val out = outDF.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double]))
-  
-    val rm = new RegressionMetrics(out)
-    println("-----------------------------------------------")
-    println("GradientBoostedTrees:")
-    println(s"MSE = ${rm.meanSquaredError}")
-    println(s"RMSE = ${rm.rootMeanSquaredError}")
-    println(s"R-squared = ${rm.r2}")
-    println(s"MAE = ${rm.meanAbsoluteError}")
-    println(s"Explained variance = ${rm.explainedVariance}")
-    println("-----------------------------------------------")
-
-    // model.write.overwrite().save("/tmp/modelLocationGradientBoostedTrees")
-  }
-
-  def metrics(df: DataFrame, predictFile: String = ""): Unit = {
-
-    val model = TrainValidationSplitModel.load("/tmp/modelLocationGradientBoostedTrees")
-
-    val outDF = model.transform(df).
-      select("prediction", "label")
-
-    if (predictFile.length > 5){
+    if (outDir.length > 5){
       outDF.write.format("csv").
         option("header", true).
-        save(predictFile)
+        save(s"${outDir}/${name}")
     }
 
     val out = outDF.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double]))
@@ -75,6 +56,16 @@ object GradientBoostedTreesExercise extends RegressionExercise {
     println(s"R-squared = ${rm.r2}")
     println(s"MAE = ${rm.meanAbsoluteError}")
     println(s"Explained variance = ${rm.explainedVariance}")
-    println("-----------------------------------------------")
+  }
+
+  // Can load also, not used in this case
+  def metrics(df: DataFrame, predictFile: String = ""): Unit = {
+
+    val model = TrainValidationSplitModel.load("/tmp/modelLocationGradientBoostedTrees")
+
+    val outDF = model.transform(df).
+      select("prediction", "label")
+
+    outDF.show(5, false)
   }
 }

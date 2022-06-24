@@ -9,9 +9,9 @@ import scala.collection.mutable.ArrayBuffer
 
 trait RegressionExercise {
 
-  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String], testDF: DataFrame): Unit
+  def trainModel(df: DataFrame, cateCols: Array[String], doubleCols: Array[String], testDF: DataFrame, outDir: String = ""): Unit
 
-  def metrics(df: DataFrame, predictFile: String = ""): Unit
+  def name: String
 
   final def earlyEncodeStates(cateCols: Array[String], doubleCols: Array[String]): ArrayBuffer[PipelineStage] = {
 
